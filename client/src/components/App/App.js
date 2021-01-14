@@ -1,11 +1,16 @@
+import React from 'react';
 import './App.css';
+import ChatApp from '../ChatApp/ChatApp';
+
+
 
 function App() {
+
   return (
     <div className="App">
-     <h1>HELLO WORLD!</h1>
+      <ChatApp/>
     </div>
-  );
+  )
 }
 
 export default App;
