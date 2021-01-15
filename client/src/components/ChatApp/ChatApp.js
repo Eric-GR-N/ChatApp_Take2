@@ -29,10 +29,10 @@ const ChatApp = ()=>{
         socket.on('politics', ({message})=>{
             setPoliticsChat([...politicsChat, message]);
         })
-        socket.on('politics', ({message})=>{
+        socket.on('religion', ({message})=>{
             setReligionChat([...religionChat, message]);
         })
-        socket.on('politics', ({message})=>{
+        socket.on('sports', ({message})=>{
             setSportsChat([...sportsChat, message]);
         })
     },[fitnessChat, musicChat, politicsChat, religionChat, sportsChat])

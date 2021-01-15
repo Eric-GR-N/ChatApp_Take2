@@ -83,7 +83,7 @@ io.on("connection", function(socket) {
     })
   })
 
-    //query data for religion chat
+    //query data for sports chat
     socket.on('sports', (data)=>{
 
       const {message, time, date} = data;
