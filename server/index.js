@@ -1,30 +1,45 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').createServer(app);
 const socket = require('socket.io');
 const io = socket(server);
 const mysql = require('mysql');
+const PORT = 5000;
+let tableSwitch = 'fitness';
 require('dotenv').config();
 
+
 //Connecting database
-const db = mysql.createPool({
+const db = mysql.createConnection({
   host: "localhost",
   user: "Eric",
   password: process.env.DB_PASSWORD,
   database: "chatapp_socket_db"
 })
 
-server.listen(5000, ()=>{
-    console.log('Hello, im listening on port 5000');
+
+//Setting port for the backend
+server.listen(PORT, ()=>{
+    console.log(`Hello, im listening on ${PORT}`);
 })
 
-
-
 io.on("connection", function(socket) {
+
+  //Sends chat to everybode that a new connection to the app is made
+  io.emit('new_connection', {
+    message: 'A new user has connected to the app!',
+    greeting: 'Welcome to the chatroom, lets start chatting'
+  })
+
+  //Decides wich table we will retrieve data from
+  socket.on('room', (data)=>{
+    const {table} = data;
+    tableSwitch = table.toLowerCase();
+  })
 
   //query data for fitness chat
   socket.on('fitness', (data)=>{
 
-    
     const {message, time, date} = data;
     const sqlInsertFitness = 'INSERT INTO fitness (message, time, date) VALUES (?,?,?)';
 
@@ -103,7 +118,20 @@ io.on("connection", function(socket) {
 
 app.get('/', (req, res)=>{
     res.send('The Backend are up and running');
-  })
+})
+
+
+//Fetches our aggregated data with api from database, in this example we are searching for the longest message
+app.get('/getdata', (req, res)=>{
+  const queryString = `SELECT * FROM ${tableSwitch} WHERE LENGTH(message) = (SELECT MAX(LENGTH(message))FROM ${tableSwitch})`
+  db.query(queryString, (err, result)=>{
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+})
 
 
 

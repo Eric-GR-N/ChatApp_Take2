@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './ChatApp.css';
 import io from 'socket.io-client';
+import axios from 'axios';
 const socket = io.connect('http://localhost:5000');
 
 const ChatApp = ()=>{
@@ -12,14 +13,24 @@ const ChatApp = ()=>{
     const [religionChat, setReligionChat] = useState([]);
     const [sportsChat, setSportsChat] = useState([]);
     const [room, setRoom] = useState('');
+    const [longest, setLongest] = useState('');
     const dateObject = new Date();
     const date = new Date().toISOString().split('T')[0];
     const time = dateObject.toLocaleTimeString();
 
 
-
-
     useEffect(()=>{
+
+        //Broadcast to all users when a user i logged on
+        socket.on('new_connection', ({message, greeting})=>{
+
+            setFitnessChat([...fitnessChat, message]);
+            setMusicChat([...musicChat, message]);
+            setPoliticsChat([...politicsChat, message]);
+            setReligionChat([...religionChat, message]);
+            setSportsChat([...sportsChat, message]);
+
+        })
         socket.on('fitness', ({message})=>{
             setFitnessChat([...fitnessChat, message]);
         })
@@ -39,6 +50,10 @@ const ChatApp = ()=>{
 
     const setRoomFunction = (e)=>{
         setRoom(e.target.innerText);
+
+        socket.emit('room', {
+            table: e.target.innerText
+        })
     }
 
     const onTextChange = (e)=>{
@@ -53,7 +68,6 @@ const ChatApp = ()=>{
         switch(room){
             case 'Fitness': 
             chatLog = fitnessChat.map((item, index)=>{
-                console.log('Now we are in');
                 return <h4 key={index}>{item}</h4>
                 
             });
@@ -128,6 +142,15 @@ const ChatApp = ()=>{
         }
     }
 
+    const testAxios = ()=>{
+        const url = 'http://localhost:5000/getdata';
+        axios.get(url).then((response) =>{
+            setLongest(response.data[0].message);
+        })
+
+        return <h5>{longest}</h5>
+    }
+
 
     return (
         <div className="app-container">
@@ -146,7 +169,11 @@ const ChatApp = ()=>{
                   <input onChange={e =>onTextChange(e)} type="text" name="message" value={state.message}></input>
                   <button onClick={e=>onSubmit(e)}>Send message</button>
               </form>
-              
+              <div className="longest">
+              <h3>The longest chatmessage in this room is currently:</h3>
+              {testAxios()}
+              <button></button>
+              </div>
             </div>
         </div>
     )
