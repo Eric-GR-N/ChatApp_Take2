@@ -6,23 +6,36 @@ const socket = io.connect('http://localhost:5000');
 const ChatApp = ()=>{
 
     const [state, setState] = useState({message: ''});
-    const [chat, setChat] = useState([]);
-    const [secondChat, setSecondChat] = useState([]);
-    const [thirdChat, setThirdChat] = useState([]);
+    const [fitnessChat, setFitnessChat] = useState([]);
+    const [musicChat, setMusicChat] = useState([]);
+    const [politicsChat, setPoliticsChat] = useState([]);
+    const [religionChat, setReligionChat] = useState([]);
+    const [sportsChat, setSportsChat] = useState([]);
     const [room, setRoom] = useState('');
+    const dateObject = new Date();
+    const date = new Date().toISOString().split('T')[0];
+    const time = dateObject.toLocaleTimeString();
+
+
 
 
     useEffect(()=>{
-        socket.on('message1', ({message})=>{
-            setChat([...chat, message]);
+        socket.on('fitness', ({message})=>{
+            setFitnessChat([...fitnessChat, message]);
         })
-        socket.on('message2', ({message})=>{
-            setSecondChat([...secondChat, message]);
+        socket.on('music', ({message})=>{
+            setMusicChat([...musicChat, message]);
         })
-        socket.on('message3', ({message})=>{
-            setThirdChat([...thirdChat, message]);
+        socket.on('politics', ({message})=>{
+            setPoliticsChat([...politicsChat, message]);
         })
-    },[chat, secondChat, thirdChat])
+        socket.on('politics', ({message})=>{
+            setReligionChat([...religionChat, message]);
+        })
+        socket.on('politics', ({message})=>{
+            setSportsChat([...sportsChat, message]);
+        })
+    },[fitnessChat, musicChat, politicsChat, religionChat, sportsChat])
 
     const setRoomFunction = (e)=>{
         setRoom(e.target.innerText);
@@ -38,19 +51,31 @@ const ChatApp = ()=>{
 
 
         switch(room){
-            case 'Room1': 
-            chatLog = chat.map((item, index)=>{
-                return <h3 key={index}>{item}</h3>
+            case 'Fitness': 
+            chatLog = fitnessChat.map((item, index)=>{
+                console.log('Now we are in');
+                return <h4 key={index}>{item}</h4>
+                
             });
             break;
-            case 'Room2':
-            chatLog = secondChat.map((item, index)=>{
-                return <h3 key={index}>{item}</h3>
+            case 'Music':
+            chatLog = musicChat.map((item, index)=>{
+                return <h4 key={index}>{item}</h4>
             });
             break;
-            case 'Room3':
-            chatLog = thirdChat.map((item, index)=>{
-                return <h3 key={index}>{item}</h3>
+            case 'Politics':
+            chatLog = politicsChat.map((item, index)=>{
+                return <h4 key={index}>{item}</h4>
+            });
+            break;
+            case 'Religion':
+            chatLog = religionChat.map((item, index)=>{
+                return <h4 key={index}>{item}</h4>
+            });
+            break;
+            case 'Sports':
+            chatLog = sportsChat.map((item, index)=>{
+                return <h4 key={index}>{item}</h4>
             });
             break;
         }
@@ -62,20 +87,42 @@ const ChatApp = ()=>{
     const onSubmit = (e)=>{
         e.preventDefault();
 
+        console.log(room);
+
         switch(room){
-            case 'Room1': 
-            socket.emit('message1', {
-                message: state.message
+            case 'Fitness': 
+            socket.emit('fitness', {
+                message: state.message,
+                date: date,
+                time: time
             })
             break;
-            case 'Room2': 
-            socket.emit('message2', {
-                message: state.message
+            case 'Music': 
+            socket.emit('music', {
+                message: state.message,
+                date: date,
+                time: time
             })
             break;
-            case 'Room3': 
-            socket.emit('message3', {
-                message: state.message
+            case 'Politics': 
+            socket.emit('politics', {
+                message: state.message,
+                date: date,
+                time: time
+            })
+            break;
+            case 'Religion': 
+            socket.emit('religion', {
+                message: state.message,
+                date: date,
+                time: time
+            })
+            break;
+            case 'Sports': 
+            socket.emit('sports', {
+                message: state.message,
+                date: date,
+                time: time
             })
             break;
         }
@@ -85,9 +132,11 @@ const ChatApp = ()=>{
     return (
         <div className="app-container">
             <div className="chatrooms">
-                <h2 onClick={e=>setRoomFunction(e)}>Room1</h2>
-                <h2 onClick={e=>setRoomFunction(e)}>Room2</h2>
-                <h2 onClick={e=>setRoomFunction(e)}>Room3</h2>
+                <h4 onClick={e=>setRoomFunction(e)}>Fitness</h4>
+                <h4 onClick={e=>setRoomFunction(e)}>Music</h4>
+                <h4 onClick={e=>setRoomFunction(e)}>Politics</h4>
+                <h4 onClick={e=>setRoomFunction(e)}>Religion</h4>
+                <h4 onClick={e=>setRoomFunction(e)}>Sports</h4>
             </div>
             <div className="chatwindow">
             { renderChat(room)}
